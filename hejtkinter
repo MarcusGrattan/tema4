@@ -1,0 +1,434 @@
+"""Skapa tkinter fönster enligt exempel layout."""
+import tkinter as tk
+
+
+def show():
+    """Öppna resultatfönster vid knapptryck."""
+    top = tk.Toplevel(root)
+    top.geometry("200x150+575+300")
+    top.title("Resultatfönster")
+    top.attributes("-topmost", 1)
+    text = tk.Text(top, width=25, height=10)
+    text.insert(
+                tk.END, entry.get() + "\n" + r_val.get() +
+                "\n" + c_val1.get() + "\n" + c_val2.get() +
+                "\n" + c_val3.get()
+                )
+    text.grid()
+
+
+"""Definiera GUI."""
+# Root definition
+root = tk.Tk()
+root.title("Checkboxar och radioknappar")
+root.geometry("250x300+550+250")
+root.attributes("-topmost", 1)
+
+# Entrybox
+entry = tk.Entry(root)
+entry.grid(row=0, column=0, pady=5, padx=5, ipadx=55, ipady=2.5)
+
+# Radiobuttons
+r_val = tk.StringVar()
+r_val.set("inget valt")
+
+radio1 = tk.Radiobutton(root, text="gurka", value="gurka", variable=r_val)
+radio1.grid(row=1, column=0, sticky=tk.W, pady=5, padx=5)
+
+radio2 = tk.Radiobutton(root, text="tomat", value="tomat", variable=r_val)
+radio2.grid(row=2, column=0, sticky=tk.W, pady=5, padx=5)
+
+radio3 = tk.Radiobutton(root, text="oliv", value="oliv", variable=r_val)
+radio3.grid(row=3, column=0, sticky=tk.W, pady=5, padx=5)
+
+# Checkboxes
+c_val1 = tk.StringVar()
+c_val2 = tk.StringVar()
+c_val3 = tk.StringVar()
+
+check1 = tk.Checkbutton(root, text="ett", variable=c_val1,
+                        onvalue="ett", offvalue="")
+check1.grid(row=4, column=0, sticky=tk.W, pady=5, padx=5)
+check1.deselect()
+
+check2 = tk.Checkbutton(root, text="två", variable=c_val2,
+                        onvalue="två", offvalue="")
+check2.grid(row=5, column=0, sticky=tk.W, pady=5, padx=5)
+check2.deselect()
+
+check3 = tk.Checkbutton(root, text="tre", variable=c_val3,
+                        onvalue="tre", offvalue="")
+check3.grid(row=6, column=0, sticky=tk.W, pady=5, padx=5)
+check3.deselect()
+
+
+# Button
+button = tk.Button(root, text="Visa", command=show)
+button.grid(row=7, column=0, pady=5, padx=5, ipadx=100)
+
+
+root.mainloop()
+
+
+
+#!/usr/bin/env python3
+
+"""Layout funktion som placerar ut kvadrater i gränssnitt radmässigt."""
+
+import tema5
+
+
+def row_layout(squares, frame_height, frame_width, start_left, start_top):
+    """Placera ut kvadraterna i listan squares i rader.
+
+    Argument:
+    squares      -- Lista som innehåller tkinter.Label-objekt
+    frame_height -- Höjden (int) på den Frame som kvadraterna ligger i
+    frame_width  -- Bredden (int) på den Frame som kvadraterna ligger i
+    start_left   -- VÃ¤rdet True betyder att kvadraterna ska placeras ut
+                    frÃ¥n vÃ¤nster sida. Värdet False betyder att
+                    kvadraterna ska placeras ut från höger.
+    start_top    -- Värdet True betyder att kvadraterna ska börja placeras ut
+                    uppifrån. Värdet False anger att kvadraterna ska börja
+                    placeras ut från botten.
+    """
+    # Placera ut kvadrater utan att de hamnar utanfÃ¶r framen
+    if start_left and start_top:
+        # if start_left och start_top == true
+        xpos = 0
+        ypos = 0
+        for square in squares:
+            square_size = square.winfo_width()
+            xpos += square_size + (square_size//2)
+            if xpos + square_size >= frame_width - square_size:
+                xpos = square_size + (square_size//2)
+                ypos += square.winfo_height() + (square.winfo_height()//2)
+            if ypos + square.winfo_height() >= frame_height - square_size:
+                break
+            square.place(x=xpos, y=ypos)
+
+    elif not start_left and not start_top:
+        # if och start_left start_top == false
+        xpos = 0
+        ypos = frame_height-10
+        for square in squares:
+            square_size = square.winfo_width()
+            xpos -= square_size + (square_size//2)
+            if xpos - square_size < 0:
+                xpos = frame_width-10 - (square_size + (square_size//2))
+                ypos -= square.winfo_height() + (square.winfo_height()//2)
+            if ypos - square.winfo_height() < 0:
+                break
+            square.place(x=xpos, y=ypos)
+
+    elif start_left and not start_top:
+        # if start_left == True och start_top == False
+        xpos = 0
+        ypos = frame_height - squares[0].winfo_height()*2
+        for square in squares:
+            square_size = square.winfo_width()
+            xpos += square_size + (square_size//2)
+            if xpos + square_size >= frame_width - square_size:
+                xpos = square_size + (square_size//2)
+                ypos -= square.winfo_height() + (square.winfo_height()//2)
+            if ypos - square.winfo_height() < 0:
+                break
+            square.place(x=xpos, y=ypos)
+
+    else:
+        # if start_left == False och start_top == True
+        xpos = frame_width-10
+        ypos = 0
+        for square in squares:
+            square_size = square.winfo_width()
+            xpos -= square_size + (square_size//2)
+            if xpos - square_size < 0:
+                xpos = frame_width-10 - (square_size + (square_size//2))
+                ypos += square.winfo_height() + (square.winfo_height()//2)
+            if ypos + square.winfo_height() >= frame_height - square_size:
+                break
+            square.place(x=xpos, y=ypos)
+
+
+if __name__ == "__main__":
+    # layoutfunktionen som anropas av knappen "Kör layoutfunktion" skickas med
+    # som ett funktionsobjekt när vi skapar en instans av LayoutTester (GUI:t)
+    layout_tester = tema5.LayoutTester(row_layout)
+
+
+"""Skapa tkinter fönster enligt exempel layout."""
+import tkinter as tk
+
+
+"""Definiera GUI."""
+#Root definition
+root = tk.Tk()
+root.title("Layout demo")
+root.geometry("400x200+550+250")
+root.attributes("-topmost", 1)
+
+#Button definiton
+buttonframe = tk.Frame(root)
+buttonframe.grid(row=2, column=1, padx=(90, 0), pady=5)
+cancel = tk.Button(buttonframe, text="Cancel")
+send = tk.Button(buttonframe, text="Send")
+cancel.grid(column=0, row=0, ipadx=10, padx=2.5)
+send.grid(column=1, row=0, ipadx=15)
+
+#Labeldefiniiton
+text = tk.Label(root, text="Comment")
+text.grid(column=0, row=0, padx=(15, 50))
+
+#Entrybox definition
+comment = tk.Entry(root)
+comment.insert(0, "write a comment")
+comment.grid(column=1, row=0, ipady=25, ipadx=25, pady=(50, 0))
+
+
+root.mainloop()
+
+
+
+"""GrÃ¤nssnitt fÃ¶r att testa layoutalgoritmer.
+
+729G46, Temauppgift 5
+
+LayoutTester tillhandahÃ¥ller ett grÃ¤nssnitt och en Frame som kvadratiska
+tkinter.Label-instanser ska layoutas i. En layout-funktion som skÃ¶ter layouten
+av tkinter.Label-instanserna skickas som argument nÃ¤r en LayoutTester skapas.
+
+Layout-funktionen (argumentet layout_func till LayoutTester()) tar fem argument:
+
+squares      -- Lista som innehÃ¥ller tkinter.Label-objekt
+frame_height -- HÃ¶jden (int) pÃ¥ fÃ¶nstret som kvadraterna ska
+                layoutas i.
+frame_width  -- Bredden (int) pÃ¥ den Frame som kvadraterna ska
+                layoutas i.
+start_left   -- VÃ¤rdet True betyder att kvadraterna ska placeras ut frÃ¥n
+                vÃ¤nster sida. VÃ¤rdet False betyder att kvadraterna ska
+                placeras ut frÃ¥n hÃ¶ger.
+start_top    -- VÃ¤rdet True betyder att kvadraterna ska bÃ¶rja placeras ut
+                uppifrÃ¥n. VÃ¤rdet False anger att kvadraterna ska bÃ¶rja
+                placeras ut frÃ¥n botten.
+"""
+
+from random import choice, randint
+from tkinter.font import Font, NORMAL, BOLD, ITALIC, ROMAN
+from tkinter import Button, Checkbutton, Frame, Label, LabelFrame, OptionMenu
+from tkinter import Scale, Tk, IntVar, StringVar, BooleanVar
+from tkinter import N, E, W, S
+from tkinter import BOTH, HORIZONTAL, LEFT, RIGHT, TOP, BOTTOM, X, Y
+from colorsys import hsv_to_rgb
+
+
+# globala variabler fÃ¶r minsta och stÃ¶rsta kvadratsstorlek
+MIN_SQUARE_SIZE = randint(25, 40)
+MAX_SQUARE_SIZE = randint(80, 100)
+NUMBER_OF_SIZES = randint(3, 6)
+SIZE_STEP = (MAX_SQUARE_SIZE - MIN_SQUARE_SIZE) // (NUMBER_OF_SIZES-1)
+MAX_NUM_SQUARES = 250
+
+class LayoutTester(object):
+    """GrÃ¤nssnitt fÃ¶r testning av layoutfunktioner."""
+
+    def __init__(self, layout_func, debug=False):
+        """Skapa GUI och fÃ¶rbereder tkinter.Labels som ska layoutas.
+
+        layout_func -- Funktionen som ska placera kvadraterna, se
+                       modulbeskrivning ovan.
+        """
+        self.layout_func = layout_func
+        self.debug = debug
+
+        # storleksalternativ
+        self.size_options = [size for size in range(MIN_SQUARE_SIZE,
+                                                    MAX_SQUARE_SIZE+1,
+                                                    SIZE_STEP)] + ["random"]
+
+        # lista fÃ¶r kvadraterna
+        self.squares = []
+
+        # skapa grÃ¤nssnittet och kÃ¶r igÃ¥ng mainloop
+        self.ui_xpadding = 4
+        self.ui_ypadding = 4
+        self.init_ui()
+        # slumpa fram fÃ¶nsterstorlek
+        w_size = "{}x{}".format(705 + randint(0, 300),
+                                250 + randint(0, 500))
+        self.root.geometry(w_size)
+
+        self.root.mainloop()
+
+
+    def init_ui(self):
+        """Skapa gränssnittet och kör igång mainloop."""
+        self.root = Tk()
+        self.root.title("Temauppgift 5")
+        # root.resizable(width=False, height=False)
+
+        # Tk-variabler till kvadratsstorlek, antal kvadrater, start_left och
+        # start_top.
+        self.size_value = StringVar()
+        self.size_value.set(self.size_options[0])
+        self.number_of_squares = IntVar()
+        self.start_left = BooleanVar()
+        self.start_left.set(True)
+        self.start_top = BooleanVar()
+        self.start_top.set(True)
+
+        # Frame att lÃ¤gga kvadraterna i
+        self.square_frame = Frame(self.root,
+                                  #height=self.squares_frame_height,
+                                  #width=self.squares_frame_width,
+                                  bg="#eef")
+        if self.debug:
+            self.square_frame.bind("<Configure>", self.frame_changed)
+        self.square_frame.pack(side=TOP, expand=1, fill=BOTH,
+                               padx=self.ui_xpadding, pady=self.ui_ypadding)
+
+        # Frame med instÃ¤llningar
+        self.controll_panel = LabelFrame(self.root, text="Inställningar")
+        self.init_controll_panel()
+        self.controll_panel.pack(fill=BOTH,
+                                 padx=self.ui_xpadding, pady=self.ui_ypadding)
+
+        # Informationstext
+        infotext = "Kom ihåg att ändra fönstrets storlek när du testar! " + \
+                   "Se även utskrifterna i terminalen."
+        self.instructions = Label(self.root, text=infotext)
+        self.instructions.pack(anchor=W)
+
+
+    def init_controll_panel(self):
+        """Skapa kontrollpanel för inställningar."""
+        self.create_size_panel()
+        self.create_num_squares_panel()
+        self.create_start_pos_panel()
+        self.create_run_quit_panel()
+
+    def create_size_panel(self):
+        """Skapa OptionMenu för storlek på kvadraterna."""
+        size_panel = Frame(self.controll_panel)
+        Label(size_panel, text="Kvadratsstorlek").pack(side=LEFT)
+        OptionMenu(size_panel, self.size_value,
+                   *self.size_options).pack(side=LEFT)
+        size_panel.pack(side=LEFT,
+                        padx=self.ui_xpadding, pady=self.ui_ypadding)
+
+    def create_num_squares_panel(self):
+        """Skapa kontroller för att välja antal kvadrater som skapas."""
+        num_squares_panel = Frame(self.controll_panel)
+        Label(num_squares_panel, text="Antal kvadrater").pack(side=LEFT,
+                                                              anchor=S)
+        Scale(num_squares_panel, variable=self.number_of_squares,
+              from_=4, to=MAX_NUM_SQUARES, orient=HORIZONTAL).pack(side=LEFT,
+                                                                   anchor=N)
+        num_squares_panel.pack(side=LEFT, anchor=N,
+                               padx=self.ui_xpadding, pady=self.ui_ypadding)
+
+    def create_start_pos_panel(self):
+        """Skapa kontroller för att välja var layouten börjar."""
+        start_panel = Frame(self.controll_panel)
+        Checkbutton(start_panel, text="Börja från vänster", justify=LEFT,
+                    variable=self.start_left,
+                    onvalue=True, offvalue=False).pack(fill=X, anchor=N)
+        Checkbutton(start_panel, text="Börja uppifrån",
+                    variable=self.start_top, justify=LEFT,
+                    onvalue=True, offvalue=False).pack(fill=X, anchor=N)
+        start_panel.pack(side=LEFT, anchor=N,
+                         padx=self.ui_xpadding, pady=self.ui_ypadding)
+
+    def create_run_quit_panel(self):
+        """Skapa knappar för att köra layout och avsluta programmet."""
+        button_panel = Frame(self.controll_panel)
+        Button(button_panel, text="Kör layoutfunktion",
+               command=self.run_layout).pack(fill=X)
+        Button(button_panel, text="Avsluta",
+               command=self.root.quit).pack(fill=X)
+        button_panel.pack(side=RIGHT, anchor=N,
+                          padx=self.ui_xpadding, pady=self.ui_ypadding)
+
+    def create_squares(self):
+        """Skapa tkinter.Label objekt som sparas i LayoutTester-instansen.
+
+        Antalet kvadrater som ska skapas, samt kvadraternas storlek hÃ¤mtas från
+        grä¤nssnittet.
+        """
+        number_of_squares = self.number_of_squares.get()
+        size = self.size_value.get()
+        square_counter = 0
+        hue_step = 1 / number_of_squares
+        hue_value = 0
+
+        # Skapa kvadrater och lÃ¤gg dem i listan self.squares
+        while square_counter < number_of_squares:
+            # konververa hsv-färg till rgb-trippel (heltal 0-255)
+            rgb = [int(val * 255) for val in hsv_to_rgb(hue_value, 0.75, 0.70)]
+            # konvertera rgb-trippel till sträng
+            bg_color ="#{:x}{:x}{:x}".format(rgb[0], rgb[1], rgb[2])
+
+            # textfärg
+            fg_color = "#fff"
+
+            # sätt storleken på kvadraten
+            if size != "random":
+                square_size = int(size)
+            else:
+                square_size = choice(self.size_options[:-1])
+            # sätt storleken på texten baserat på kvadratstorleken
+            font_size = int(square_size * 0.6)
+
+            # skapa kvadraten
+            square = Label(self.square_frame, fg=fg_color, bg=bg_color,
+                           font=Font(family="Verdana",
+                                     weight=NORMAL,
+                                     size=font_size),
+                           text=str(square_counter + 1))
+            # spara den i listan med kvadrater
+            self.squares.append(square)
+
+            # göm kvadraten utanför det synliga området och ställ in
+            # dess storlek
+            square.place(x=-square_size, y=-square_size,
+                         height=square_size, width=square_size)
+
+            # gå vidare till nästa kvadrat och färg
+            square_counter += 1
+            hue_value += hue_step
+
+        # uppdatera geometri-info för alla widgets (ser till att de vet hur
+        # stora de Ã¤r)
+        square.update_idletasks()
+
+    def clear_squares(self):
+        """Ta bort existerande kvadrater."""
+        for square in self.squares:
+            square.destroy()
+        del self.squares[:]
+
+    def frame_changed(self, event):
+        if event.widget == self.square_frame or event.widget == self.root:
+            print("Resize. root: {}x{}, square_frame: {}x{}".format(
+                    self.root.winfo_width(), self.root.winfo_height(),
+                    self.square_frame.winfo_width(),
+                    self.square_frame.winfo_height()))
+
+    def run_layout(self):
+        """Skapa nya kvadrater och kör layoutfunktionen."""
+        # ta bort gamla kvadrater
+        self.clear_squares()
+
+        # skapa nya kvadrater
+        self.create_squares()
+
+        # placera ut kvadraterna
+        print("Running '{0}(<squares>, {1}, {2}, {3}, {4})'..."
+              .format(self.layout_func.__name__,
+                      self.square_frame.winfo_height(),
+                      self.square_frame.winfo_width(),
+                      self.start_left.get(),
+                      self.start_top.get()))
+        self.layout_func(self.squares, self.square_frame.winfo_height(),
+                         self.square_frame.winfo_width(),
+                         self.start_left.get(),
+                         self.start_top.get())
